@@ -23,11 +23,12 @@
 $ pip install -r requirements.txt
 ```
 ### settings
-#### app 만들기
+
+#### 1.app 만들기
 ```bash
-$ django-admin startapp board
+$ django-admin startapp api
 ```
-#### app 등록
+#### 2.app 등록
 ```python
 # ...another things
 INSTALLED_APPS = [
@@ -44,7 +45,22 @@ INSTALLED_APPS = [
 ]
 # ...another things
 ```
-`startapp`을 통해 생성한 app과 `rest_framework` 등록
+settings.py에 `startapp`을 통해 생성한 app과 `rest_framework`, `django-rest-knox` 등록
+
+#### 3.DATABASES Config
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'k_board',
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+```
 
 ## FBV
 
