@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSlidingSerializer
 
 
 class UserTokenSerializer(TokenObtainPairSerializer):
@@ -8,9 +8,9 @@ class UserTokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super(UserTokenSerializer, cls).get_token(user)
-        print(token)
 
-        token['email'] = user.email
+        # refresh token print
+        print(token)
         return token
 
 
