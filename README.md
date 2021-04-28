@@ -118,3 +118,5 @@ DATABASES = {
 ## DjangoORM
 
 ### Model
+
+### Simple JWT
