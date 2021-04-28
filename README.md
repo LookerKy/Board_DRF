@@ -41,11 +41,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'rest_framework',
-    'knox',
 ]
 # ...another things
 ```
-settings.py에 `startapp`을 통해 생성한 app과 `rest_framework`, `django-rest-knox` 등록
+settings.py에 `startapp`을 통해 생성한 `app`과 `rest_framework` 등록
 
 #### 3.DATABASES Config
 
