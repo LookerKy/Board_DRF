@@ -29,8 +29,11 @@ class RefreshTokenView(TokenRefreshView):
         else:
             return Response({"message": "failure"}, status=status.HTTP_401_UNAUTHORIZED)
 
+    def post(self, request, *args, **kwargs):
+        return Response({"message": "failure"}, status=status.HTTP_401_UNAUTHORIZED)
 
-class UserTokenView(TokenObtainPairView):
+
+class LoginView(TokenObtainPairView):
     serializer_class = UserTokenSerializer
 
     def post(self, request, *args, **kwargs):
