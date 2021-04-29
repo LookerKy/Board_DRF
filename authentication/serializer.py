@@ -10,7 +10,7 @@ class UserTokenSerializer(TokenObtainPairSerializer):
         token = super(UserTokenSerializer, cls).get_token(user)
 
         # refresh token print
-        print(token)
+        # print(token)
         return token
 
 
