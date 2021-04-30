@@ -8,6 +8,7 @@ from .serializer import UserTokenSerializer, CustomUserSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
+
 # @ TODO create Android token API
 
 
@@ -56,13 +57,19 @@ class CustomUserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format='json'):
+        print(request.data)
         serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        print(serializer)
+        if serializer.is_valid(raise_exception=True):
+            try:
+                user = serializer.save()
+            except Exception:
+                # 이렇게 처리하는 것이 맞는지?
+                return Response({"errors": "this email is already exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if user:
                 json = serializer.data
+                print(json)
                 return Response(json, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
