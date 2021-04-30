@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import CustomUser
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSlidingSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.validators import UniqueValidator
 
 
 class UserTokenSerializer(TokenObtainPairSerializer):
@@ -13,19 +14,27 @@ class UserTokenSerializer(TokenObtainPairSerializer):
         return token
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
+class RegisterUserSerializer(serializers.ModelSerializer):
+    # validate 기준
+    email = serializers.EmailField(required=True, validators=[UniqueValidator(queryset=CustomUser.objects.all())])
     password = serializers.CharField(min_length=8, write_only=True)
+    confirm_password = serializers.CharField(min_length=8, write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'username', 'password')
+        fields = ('email', 'username', 'password', 'confirm_password',)
         extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"password": "password does not matches"})
+        return attrs
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
+        validated_data.pop('confirm_password', None)
+        print(validated_data)
         instance = self.Meta.model(**validated_data)
-
         if password is not None:
             instance.set_password(password)
         instance.save()

@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework import permissions, status
-from .serializer import UserTokenSerializer, CustomUserSerializer
+from .serializer import UserTokenSerializer, RegisterUserSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
@@ -38,9 +38,8 @@ class LoginView(TokenObtainPairView):
     serializer_class = UserTokenSerializer
 
     def post(self, request, *args, **kwargs):
-        print(type(request.data))
         serializer = self.get_serializer(data=request.data)
-        # print(serializer)
+        print(serializer)
         try:
             serializer.is_valid(raise_exception=True)
         except TokenError as e:
@@ -57,18 +56,11 @@ class CustomUserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format='json'):
-        print(request.data)
-        serializer = CustomUserSerializer(data=request.data)
-        print(serializer)
+        serializer = RegisterUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            try:
-                user = serializer.save()
-            except Exception:
-                # 이렇게 처리하는 것이 맞는지?
-                return Response({"errors": "this email is already exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            user = serializer.save()
             if user:
                 json = serializer.data
-                print(json)
                 return Response(json, status=status.HTTP_201_CREATED)
 
 
