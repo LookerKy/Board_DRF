@@ -11,7 +11,10 @@ class Gender(Enum):
 
 class CustomUser(AbstractUser):
     username_validator = UnicodeUsernameValidator
-    email = models.EmailField(max_length=50, unique=True, blank=True)
+    username = models.CharField(max_length=150, validators=[username_validator])
+    email = models.EmailField(max_length=50, unique=True, blank=True, error_messages={
+        'unique': "this email is already exists."
+    })
     first_name = None
     last_name = None
     gender = models.CharField(max_length=6, choices=[(tag, tag.value) for tag in Gender])
