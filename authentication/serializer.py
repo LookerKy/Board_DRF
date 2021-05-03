@@ -17,13 +17,13 @@ class UserTokenSerializer(TokenObtainPairSerializer):
 class RegisterUserSerializer(serializers.ModelSerializer):
     # validate 기준
     email = serializers.EmailField(required=True, validators=[UniqueValidator(queryset=CustomUser.objects.all())])
-    password = serializers.CharField(min_length=8, write_only=True)
+    # password = serializers.CharField(min_length=8, write_only=True)
     confirm_password = serializers.CharField(min_length=8, write_only=True)
 
     class Meta:
         model = CustomUser
         fields = ('email', 'username', 'password', 'confirm_password',)
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
