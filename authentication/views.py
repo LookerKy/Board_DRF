@@ -4,9 +4,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework import permissions, status
-from .serializer import UserTokenSerializer, RegisterUserSerializer
+from .serializer import UserTokenSerializer, RegisterUserSerializer, UserProfileSerializer
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.decorators import api_view
+from .models import CustomUser
 
 
 # @ TODO create Android token API
@@ -52,6 +54,7 @@ class LoginView(TokenObtainPairView):
         return response
 
 
+# @TODO APIView to GenericAPIView 로 변경
 class CustomUserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -64,6 +67,16 @@ class CustomUserRegister(APIView):
                 return Response(json, status=status.HTTP_201_CREATED)
 
 
+class UserRegisterView(CreateAPIView):
+    serializer_class = RegisterUserSerializer
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
 @api_view(['GET'])
-def hello_world(request):
-    return Response(data={"hello": "world"}, status=status.HTTP_200_OK)
+def user_profile(request):
+    user = CustomUser.objects.get(email=request.user.email)
+    serializer = UserProfileSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
