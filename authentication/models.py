@@ -1,20 +1,19 @@
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from enum import Enum
-
-
-class Gender(Enum):
-    male = 'Male'
-    female = 'Female'
+from .utils import Gender
 
 
 class CustomUser(AbstractUser):
-    username_validator = UnicodeUsernameValidator
-
+    username = models.CharField(max_length=150)
+    email = models.EmailField(max_length=50, unique=True, error_messages={
+        'unique': "this email is already exists."
+    })
+    gender = models.CharField(max_length=6, choices=Gender.choice(), default=Gender.Male)
     first_name = None
     last_name = None
-    gender = models.CharField(max_length=6, choices=[(tag, tag.value) for tag in Gender])
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     class Meta:
         db_table = 'users'
