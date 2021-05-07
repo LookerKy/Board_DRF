@@ -1,10 +1,10 @@
-from enum import IntEnum
+from enum import Enum
 
 
-class Gender(IntEnum):
-    Male = 1
-    Female = 2
+class Gender(Enum):
+    Male = 'male'
+    Female = 'female'
 
     @classmethod
     def choice(cls):
-        return [(key.value, key.name) for key in cls]
+        return [(key.value, key.name) for key in Gender]

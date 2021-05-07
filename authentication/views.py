@@ -11,8 +11,6 @@ from .models import CustomUser
 
 
 # @ TODO create Android token API
-
-
 class RefreshTokenView(TokenRefreshView):
     serializer_class = TokenRefreshSerializer
 
