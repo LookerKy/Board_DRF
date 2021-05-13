@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.validators import UniqueValidator
+
+
 # import re
 
 
@@ -25,7 +27,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'username', 'password', 'confirm_password', 'gender')
+        fields = ('email', 'username', 'password', 'gender')
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def validate(self, attrs):
@@ -45,8 +47,6 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
-
-
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
