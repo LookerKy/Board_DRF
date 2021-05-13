@@ -2,7 +2,6 @@ from django.db import models
 
 # Create your models here.
 from django.utils.text import Truncator
-
 from authentication.models import CustomUser
 
 
@@ -21,7 +20,7 @@ class BoardModel(models.Model):
 class TopicModel(models.Model):
     subject = models.CharField(max_length=255)
     last_update = models.DateTimeField(auto_now_add=True)
-    board = models.ForeignKey(related_name='topics', on_delete=models.CASCADE)
+    board = models.ForeignKey(BoardModel, related_name='topics', on_delete=models.CASCADE)
     created_id = models.ForeignKey(CustomUser, related_name='topics', on_delete=models.CASCADE)
     last_updated = models.DateTimeField(auto_now_add=True)
     views = models.PositiveIntegerField(default=0)
