@@ -1,3 +1,5 @@
+from datetime import datetime
+from pytz import timezone
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
@@ -6,8 +8,9 @@ from rest_framework import permissions, status
 from .serializer import UserTokenSerializer, RegisterUserSerializer, UserProfileSerializer
 from rest_framework.views import APIView
 from rest_framework import generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from .models import CustomUser
+from django.shortcuts import get_object_or_404
 
 
 # @ TODO create Android token API
@@ -38,7 +41,6 @@ class LoginView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print(serializer)
         try:
             serializer.is_valid(raise_exception=True)
         except TokenError as e:
@@ -46,7 +48,16 @@ class LoginView(TokenObtainPairView):
 
         # print(serializer.validated_data["refresh"])
         # Response(serializer.validated_data, status=status.HTTP_200_OK)
-        # @ ToDo Response 로 갈아엎기
+        user_last_login = CustomUser.objects.get(email=request.data['email'])
+        d = datetime.now(timezone('Asia/Seoul'))
+        user_last_login.last_login = d
+        print(d)
+        print(type(d))
+        # d.astimezone(pytz.timezone('Asia/Seoul'))
+        # print(d)
+
+        user_last_login.save()
+
         res = Response({"access": serializer.validated_data["access"]}, status=status.HTTP_200_OK)
         res.set_cookie('refresh', serializer.validated_data["refresh"], httponly=True)
         return res
@@ -55,13 +66,24 @@ class LoginView(TokenObtainPairView):
 class CustomUserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, format='json'):
+    def post(self, request):
         serializer = RegisterUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             if user:
-                json = serializer.data
-                return Response(json, status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def user_register(request):
+    serializer = RegisterUserSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user = serializer.save()
+        if user:
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"message": "failure"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserRegisterView(generics.CreateAPIView):
@@ -75,6 +97,6 @@ class UserRegisterView(generics.CreateAPIView):
 
 @api_view(['GET'])
 def user_profile(request):
-    user = CustomUser.objects.get(email=request.user.email)
+    user = get_object_or_404(CustomUser, email=request.user.email)
     serializer = UserProfileSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)

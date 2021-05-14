@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 from .models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -11,10 +13,15 @@ class UserTokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super(UserTokenSerializer, cls).get_token(user)
-
         # refresh token print
-        # print(token)
+        print(type(token))
         return token
+
+    # def create(self, validated_data):
+    #     print(validated_data)
+    #     print(CustomUser.objects.all())
+    #     instance = CustomUser(last_login=datetime.timedelta())
+    #     return instance
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -27,7 +34,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'username', 'password', 'gender')
+        fields = ('email', 'username', 'password', 'gender', 'confirm_password')
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def validate(self, attrs):
@@ -52,4 +59,4 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('email', 'username',)
+        exclude = ('password',)
