@@ -11,9 +11,8 @@ class UserTokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super(UserTokenSerializer, cls).get_token(user)
-
         # refresh token print
-        # print(token)
+        print(type(token))
         return token
 
 
@@ -27,7 +26,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'username', 'password', 'gender')
+        fields = ('email', 'username', 'password', 'gender', 'confirm_password')
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def validate(self, attrs):
@@ -52,4 +51,4 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('email', 'username',)
+        exclude = ('password',)
