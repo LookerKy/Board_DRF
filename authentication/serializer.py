@@ -1,5 +1,3 @@
-import datetime
-
 from rest_framework import serializers
 from .models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -16,12 +14,6 @@ class UserTokenSerializer(TokenObtainPairSerializer):
         # refresh token print
         print(type(token))
         return token
-
-    # def create(self, validated_data):
-    #     print(validated_data)
-    #     print(CustomUser.objects.all())
-    #     instance = CustomUser(last_login=datetime.timedelta())
-    #     return instance
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):

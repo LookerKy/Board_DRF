@@ -1,5 +1,4 @@
-from datetime import datetime
-from pytz import timezone
+from django.utils.timezone import now
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
@@ -10,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from .models import CustomUser
+from .response import set_cookie_response
 from django.shortcuts import get_object_or_404
 
 
@@ -23,12 +23,10 @@ class RefreshTokenView(TokenRefreshView):
             serializer = self.get_serializer(data={'refresh': request.COOKIES['refresh']})
             try:
                 serializer.is_valid(raise_exception=True)
-                print(serializer.validated_data)
             except TokenError as e:
                 raise InvalidToken(e.args[0])
-            res = Response({"access": serializer.validated_data["access"]}, status=status.HTTP_200_OK)
-            res.set_cookie('refresh', serializer.validated_data["refresh"], httponly=True)
-            return res
+
+            return set_cookie_response(serializer.validated_data)
         else:
             return Response({"message": "failure"}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -48,19 +46,9 @@ class LoginView(TokenObtainPairView):
 
         # print(serializer.validated_data["refresh"])
         # Response(serializer.validated_data, status=status.HTTP_200_OK)
-        user_last_login = CustomUser.objects.get(email=request.data['email'])
-        d = datetime.now(timezone('Asia/Seoul'))
-        user_last_login.last_login = d
-        print(d)
-        print(type(d))
-        # d.astimezone(pytz.timezone('Asia/Seoul'))
-        # print(d)
+        set_last_login_time(request.data['email'])
 
-        user_last_login.save()
-
-        res = Response({"access": serializer.validated_data["access"]}, status=status.HTTP_200_OK)
-        res.set_cookie('refresh', serializer.validated_data["refresh"], httponly=True)
-        return res
+        return set_cookie_response(serializer.validated_data)
 
 
 class CustomUserRegister(APIView):
@@ -100,3 +88,10 @@ def user_profile(request):
     user = get_object_or_404(CustomUser, email=request.user.email)
     serializer = UserProfileSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def set_last_login_time(email):
+    user = CustomUser.objects.get(email=email)
+    login_datetime = now()
+    user.last_login = login_datetime
+    user.save()
