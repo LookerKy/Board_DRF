@@ -19,12 +19,12 @@ class TopicList(generics.RetrieveAPIView):
     serializer_class = TopicListSerializer
 
 
+# Topic List만 나오게
 class TopicLists(generics.ListCreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
         queryset = get_object_or_404()
 
-    def list(self, request, *args, **kwargs):
-        return reque
+
 
